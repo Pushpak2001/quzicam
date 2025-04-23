@@ -19,6 +19,7 @@ import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useRouter } from 'next/navigation';
+import { type GeistSans } from 'next/font/google';
 
 interface Question {
   question: string;
@@ -48,8 +49,9 @@ const App = () => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [hasCameraPermission, setHasCameraPermission] = useState(false);
   const [isCameraActive, setIsCameraActive] = useState(false);
-
   const router = useRouter();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
 
   useEffect(() => {
     let stream: MediaStream | null = null;
@@ -151,6 +153,12 @@ const App = () => {
   }, [imageSrc, numQuestions, difficulty, toast]);
 
   const handleAnswerSelection = (optionIndex: number) => {
+    if (isSubmitting) {
+      return; // Prevent multiple submissions
+    }
+
+    setIsSubmitting(true); // Disable further clicks
+
     setQuiz((prevQuiz) => {
       const updatedQuiz = [...prevQuiz];
       const isCorrect = optionIndex === prevQuiz[activeQuestionIndex].correctAnswerIndex;
@@ -162,7 +170,7 @@ const App = () => {
       return updatedQuiz;
     });
 
-    // Automatically move to the next question
+    // Automatically move to the next question after a delay
     setTimeout(() => {
       if (activeQuestionIndex < quiz.length - 1) {
         setActiveQuestionIndex((prevIndex) => prevIndex + 1);
@@ -170,6 +178,7 @@ const App = () => {
         // If it's the last question, finish the quiz
         handleFinishQuiz();
       }
+      setIsSubmitting(false); // Re-enable submission after delay
     }, 1000);
   };
 
@@ -225,6 +234,15 @@ const App = () => {
 
   const handleActivateCamera = () => {
     setIsCameraActive(true); // Activate camera when button is clicked
+  };
+
+  const getLanguageSpecificClassName = () => {
+    switch (quizLanguage) {
+      case 'mr':
+        return 'marathi-font';
+      default:
+        return ''; // Default style or no style
+    }
   };
 
   return (
@@ -358,7 +376,7 @@ const App = () => {
                 <CardTitle>
                   Question {activeQuestionIndex + 1} of {quiz.length}
                 </CardTitle>
-                <CardDescription>{currentQuestion?.question}</CardDescription>
+                <CardDescription className={getLanguageSpecificClassName()}>{currentQuestion?.question}</CardDescription>
               </CardHeader>
               <CardContent className="grid gap-4">
                 {currentQuestion?.options.map((option, index) => (
@@ -400,6 +418,11 @@ const App = () => {
           {/* History Tab Content - unchanged */}
         </TabsContent>
       </Tabs>
+      <style jsx>{`
+        .marathi-font {
+          font-family: 'Arial Unicode MS', sans-serif; /* Use a font that supports Marathi script */
+        }
+      `}</style>
     </div>
   );
 };
