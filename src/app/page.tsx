@@ -27,6 +27,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { CardFooter } from "@/components/ui/card";
 
 interface Question {
   question: string;
