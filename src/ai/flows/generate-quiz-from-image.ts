@@ -21,7 +21,7 @@ const GenerateQuizFromImageInputSchema = z.object({
     .int()
     .min(1)
     .max(10)
-    .default(5)
+    .default(3)
     .describe('The number of questions to generate for the quiz.'),
   difficulty: z
     .enum(['easy', 'medium', 'hard'])
@@ -99,7 +99,7 @@ const generateQuizPrompt = ai.definePrompt({
         .int()
         .min(1)
         .max(10)
-        .default(5)
+        .default(3)
         .describe('The number of questions to generate for the quiz.'),
       difficulty: z
         .enum(['easy', 'medium', 'hard'])
@@ -119,25 +119,24 @@ const generateQuizPrompt = ai.definePrompt({
       ).describe('The generated quiz questions.'),
     }),
   },
-  prompt: `You are an AI quiz generator.  You will generate a multiple-choice quiz based on the content of the image provided. 
-  
-  First, detect the language of the image content using the detectLanguage tool.
-  Then, generate questions about the image in the detected language.
-  If the detected language is not English or Marathi, translate the question and answer options to the detected language using the translateText tool.
-  If the detected language is Marathi, ensure the questions and options are in Marathi script.
-  
-  The number of questions to generate should be taken from the numQuestions field. 
-  The difficulty of the questions should be set by the difficulty field.
+  prompt: `You are an intelligent AI quiz generator and language expert. You will generate a multiple-choice quiz based on the content of the image provided.
 
-  Return your response as a JSON object. Do not include any other text. 
-  
-  Here is the photo: {{media url=photoDataUri}}
+  First, detect the language of the image content using the detectLanguage tool.
+  Then, generate multiple-choice questions in the detected language. Ensure the questions are relevant to the image content and are of the specified difficulty level.
+  Each question should have four options, and one should be the correct answer.
+
+  Here's how to format your response:
+
+  Output format: JSON array of question objects with keys 'question', 'options', and 'correctAnswerIndex'. Each question must have 4 options.
+
+  If the detected language is Marathi, ensure the questions and options are in Marathi script (Devanagari).
+  If the detected language is not English or Marathi, translate the questions and options to the detected language using the translateText tool.
+
+Here is the photo: {{media url=photoDataUri}}
 
 Difficulty: {{{difficulty}}}
 Number of Questions: {{{numQuestions}}}
 Language: {{{language}}}
-
-Output format: JSON array of question objects with keys 'question', 'options', and 'correctAnswerIndex'. Each question must have 4 options.
 `,
 });
 
