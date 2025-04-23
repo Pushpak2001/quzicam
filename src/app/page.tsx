@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { captureImage } from "@/services/camera";
 import { generateQuizFromImage } from "@/ai/flows/generate-quiz-from-image";
 import {
   Card,
@@ -13,22 +12,12 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
+  CardFooter,
 } from "@/components/ui/card";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useToast } from "@/hooks/use-toast";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
-import { CardFooter } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 interface Question {
   question: string;
@@ -50,7 +39,6 @@ const App = () => {
   const [activeQuestionIndex, setActiveQuestionIndex] = useState<number>(0);
   const [imageSrc, setImageSrc] = useState<string | null>(null);
   const [quizStarted, setQuizStarted] = useState<boolean>(false);
-  const [cameraOpen, setCameraOpen] = useState(false);
   const [quizHistory, setQuizHistory] = useState<
     {
       quiz: Question[];
@@ -62,6 +50,33 @@ const App = () => {
   const [language, setLanguage] = useState<string>("en"); // Default language
   const { toast } = useToast();
   const [isGenerating, setIsGenerating] = useState(false);
+
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [hasCameraPermission, setHasCameraPermission] = useState(false);
+
+  useEffect(() => {
+    const getCameraPermission = async () => {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        setHasCameraPermission(true);
+
+        if (videoRef.current) {
+          videoRef.current.srcObject = stream;
+        }
+      } catch (error) {
+        console.error('Error accessing camera:', error);
+        setHasCameraPermission(false);
+        toast({
+          variant: 'destructive',
+          title: 'Camera Access Denied',
+          description: 'Please enable camera permissions in your browser settings to use this app.',
+        });
+      }
+    };
+
+    getCameraPermission();
+  }, []);
+
 
   const handleImageUpload = useCallback(
     async (file: File | null) => {
@@ -179,18 +194,24 @@ const App = () => {
   const isCorrect =
     currentQuestion?.userAnswer === currentQuestion?.correctAnswerIndex;
 
-  const handleCaptureImage = async () => {
-    try {
-      const imageData = await captureImage();
-      setImageSrc(imageData);
-      setCameraOpen(false);
-    } catch (error: any) {
+  const handleCaptureImage = () => {
+    if (!videoRef.current) {
       toast({
-        title: "Failed to capture image.",
-        description: error.message,
+        title: "Camera not initialized.",
+        description: "Please wait for the camera to initialize and grant permissions.",
         variant: "destructive",
       });
+      return;
     }
+
+    const video = videoRef.current;
+    const canvas = document.createElement('canvas');
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    canvas.getContext('2d')?.drawImage(video, 0, 0, video.videoWidth, video.videoHeight);
+
+    const imageDataURL = canvas.toDataURL('image/png');
+    setImageSrc(imageDataURL);
   };
 
   return (
@@ -274,26 +295,24 @@ const App = () => {
                     >
                       Upload from Device
                     </Label>
-                    <AlertDialog>
-                      <AlertDialogTrigger asChild>
-                        <Button variant="outline">Capture Image</Button>
-                      </AlertDialogTrigger>
-                      <AlertDialogContent>
-                        <AlertDialogHeader>
-                          <AlertDialogTitle>Capture Image</AlertDialogTitle>
-                          <AlertDialogDescription>
-                            Do you want to capture image from camera?
-                          </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                          <AlertDialogCancel>Cancel</AlertDialogCancel>
-                          <AlertDialogAction onClick={handleCaptureImage}>
-                            Continue
-                          </AlertDialogAction>
-                        </AlertDialogFooter>
-                      </AlertDialogContent>
-                    </AlertDialog>
+
+                    <Button variant="outline" onClick={handleCaptureImage} disabled={!hasCameraPermission}>
+                      Capture Image
+                    </Button>
                   </div>
+
+                  <video ref={videoRef} className="w-full aspect-video rounded-md" autoPlay muted />
+
+                  { !(hasCameraPermission) && (
+                    <Alert variant="destructive">
+                              <AlertTitle>Camera Access Required</AlertTitle>
+                              <AlertDescription>
+                                Please allow camera access to use this feature.
+                              </AlertDescription>
+                      </Alert>
+                  )
+                  }
+
                   {imageSrc && (
                     <img
                       src={imageSrc}
