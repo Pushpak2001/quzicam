@@ -456,16 +456,18 @@ const App = () => {
                           </p>
                           <p>
                             <strong>Your Answer:</strong>{" "}
-                            {question.userAnswer !== null
-                              ? question.options[question.userAnswer]
-                              : "Not Answered"}
+                            <span className={cn(
+                                question.userAnswer === question.correctAnswerIndex
+                                  ? "text-green-500"
+                                  : "text-red-500"
+                              )}>
+                                {question.userAnswer !== null
+                                  ? question.options[question.userAnswer]
+                                  : "Not Answered"}
+                            </span>
                           </p>
                           <p
-                            className={
-                              question.userAnswer === question.correctAnswerIndex
-                                ? "text-green-500"
-                                : "text-red-500"
-                            }
+                            className="text-green-500"
                           >
                             <strong>Correct Answer:</strong>{" "}
                             {question.options[question.correctAnswerIndex]}
