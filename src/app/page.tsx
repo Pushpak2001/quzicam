@@ -19,7 +19,7 @@ import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useRouter } from 'next/navigation';
-import { type GeistSans } from 'next/font/google';
+import { useSearchParams } from 'next/navigation';
 
 interface Question {
   question: string;
@@ -51,7 +51,6 @@ const App = () => {
   const [isCameraActive, setIsCameraActive] = useState(false);
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
-
 
   useEffect(() => {
     let stream: MediaStream | null = null;
@@ -186,15 +185,12 @@ const App = () => {
     // Calculate the score
     const score = calculateScore();
 
-    // Navigate to the quiz results page
-    router.push({
-      pathname: '/quiz-results',
-      query: {
-        quiz: JSON.stringify(quiz),
-        score: score.toString(),
-        language: quizLanguage,
-      },
-    } as any);
+    const url = new URL('/quiz-results', window.location.origin);
+    url.searchParams.append('quiz', JSON.stringify(quiz));
+    url.searchParams.append('score', score.toString());
+    url.searchParams.append('language', quizLanguage);
+
+    router.push(url.toString());
   };
 
   const calculateScore = () => {
