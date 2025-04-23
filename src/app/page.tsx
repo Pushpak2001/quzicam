@@ -11,8 +11,8 @@ import {
   CardContent,
   CardDescription,
   CardHeader,
-  CardTitle,
   CardFooter,
+  CardTitle,
 } from "@/components/ui/card";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useToast } from "@/hooks/use-toast";
@@ -194,7 +194,7 @@ const App = () => {
         score: score.toString(),
         language: quizLanguage,
       },
-    });
+    } as any);
   };
 
   const calculateScore = () => {
