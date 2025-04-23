@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useCallback, useEffect, useRef } from "react";
@@ -385,7 +386,7 @@ const App = () => {
                   Question {activeQuestionIndex + 1} of {quiz.length}
                 </CardTitle>
                 <CardDescription className={getLanguageSpecificClassName()}>
-                  {currentQuestion?.question}
+                  <strong className="font-bold">{currentQuestion?.question}</strong>
                 </CardDescription>
               </CardHeader>
               <CardContent className="grid gap-4">
