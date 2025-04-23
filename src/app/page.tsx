@@ -137,8 +137,9 @@ const App = () => {
 
       setQuiz(initialQuizState);
       setActiveQuestionIndex(0);
-      setQuizStarted(true);
       setQuizLanguage(generatedQuiz.language); // Set the detected language
+      setQuizStarted(true);
+
     } catch (error: any) {
       toast({
         title: "Failed to generate quiz. Please try again.",
@@ -171,12 +172,15 @@ const App = () => {
     // Automatically move to the next question after a delay
     setTimeout(() => {
       setIsSubmitting(false); // Re-enable submission after delay
+      moveToNextQuestion();
     }, 1000);
   };
 
   const moveToNextQuestion = () => {
       if (activeQuestionIndex < quiz.length - 1) {
         setActiveQuestionIndex((prevIndex) => prevIndex + 1);
+      } else {
+         handleFinishQuiz();
       }
   }
 
@@ -190,6 +194,7 @@ const App = () => {
     url.searchParams.append('language', quizLanguage);
 
     router.push(url.toString());
+    setQuizStarted(false);
   };
 
   const calculateScore = () => {
@@ -239,9 +244,6 @@ const App = () => {
         return ''; // Default style or no style
     }
   };
-
-  const showNextButton = currentQuestion?.userAnswer !== null && activeQuestionIndex < quiz.length -1;
-  const showFinishButton = currentQuestion?.userAnswer !== null && activeQuestionIndex === quiz.length - 1;
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-4">
@@ -374,7 +376,9 @@ const App = () => {
                 <CardTitle>
                   Question {activeQuestionIndex + 1} of {quiz.length}
                 </CardTitle>
-                <CardDescription className={getLanguageSpecificClassName()}>{currentQuestion?.question}</CardDescription>
+                <CardDescription className={cn(
+                  getLanguageSpecificClassName(),
+                )}>{currentQuestion?.question}</CardDescription>
               </CardHeader>
               <CardContent className="grid gap-4">
                 {currentQuestion?.options.map((option, index) => (
@@ -403,7 +407,6 @@ const App = () => {
                     )}
                     onClick={() => {
                         handleAnswerSelection(index);
-                        moveToNextQuestion();
                     }}
                     disabled={currentQuestion.userAnswer !== null}
                   >
@@ -411,12 +414,6 @@ const App = () => {
                   </Button>
                 ))}
               </CardContent>
-              {showNextButton && (
-                <Button onClick={moveToNextQuestion}>Next Question</Button>
-              )}
-              {showFinishButton && (
-                <Button onClick={handleFinishQuiz}>Finish Quiz</Button>
-              )}
             </Card>
           )}
         </TabsContent>
