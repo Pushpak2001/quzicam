@@ -2,7 +2,6 @@ import type {Metadata} from 'next/server';
 import {Geist, Geist_Mono} from 'next/font/google';
 import './globals.css';
 import {Toaster} from "@/components/ui/toaster";
-import {ModeToggle} from "@/components/mode-toggle";
 import {ThemeProvider} from "@/components/theme-provider";
 
 const geistSans = Geist({
@@ -28,9 +27,6 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        <div className="fixed top-4 right-4 z-50">
-          <ModeToggle />
-        </div>
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
           {children}
         </ThemeProvider>
@@ -39,4 +35,5 @@ export default function RootLayout({
     </html>
   );
 }
+
 
