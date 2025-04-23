@@ -395,11 +395,11 @@ const App = () => {
                 ))}
               </CardContent>
               <CardFooter className="flex justify-end">
-                {isLastQuestion ? (
+                {/* {isLastQuestion ? (
                   <Button onClick={handleFinishQuiz}>Finish Quiz</Button>
                 ) : (
                  null
-                )}
+                )} */}
               </CardFooter>
             </Card>
           )}
