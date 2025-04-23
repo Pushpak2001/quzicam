@@ -57,7 +57,7 @@ const App = () => {
       date: Date;
     }[]
   >([]);
-
+  const [language, setLanguage] = useState<string>("en"); // Default language
   const { toast } = useToast();
 
   const handleImageUpload = useCallback(
@@ -87,10 +87,15 @@ const App = () => {
     }
 
     try {
+      // Here should be implemented language detection
+      // For now I will set language to en
+      const detectedLanguage = 'en';
+
       const generatedQuiz = await generateQuizFromImage({
         photoDataUri: imageSrc,
         numQuestions: numQuestions,
         difficulty: difficulty,
+        language: detectedLanguage, // Use detected language
       });
 
       // Initialize user answers to null for each question

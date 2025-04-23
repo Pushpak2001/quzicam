@@ -27,6 +27,7 @@ const GenerateQuizFromImageInputSchema = z.object({
     .enum(['easy', 'medium', 'hard'])
     .default('medium')
     .describe('The difficulty level of the quiz.'),
+  language: z.string().default('en').describe('The language to generate the quiz in.'), // Added language field
 });
 export type GenerateQuizFromImageInput = z.infer<typeof GenerateQuizFromImageInputSchema>;
 
@@ -65,6 +66,7 @@ const generateQuizPrompt = ai.definePrompt({
         .enum(['easy', 'medium', 'hard'])
         .default('medium')
         .describe('The difficulty level of the quiz.'),
+      language: z.string().default('en').describe('The language to generate the quiz in.'), // Added language
     }),
   },
   output: {
@@ -78,10 +80,11 @@ const generateQuizPrompt = ai.definePrompt({
       ).describe('The generated quiz questions.'),
     }),
   },
-  prompt: `You are an AI quiz generator.  You will generate a multiple-choice quiz based on the content of the image provided. The user will upload an image and you should respond with questions about the image. The number of questions to generate should be taken from the numQuestions field. The difficulty of the questions should be set by the difficulty field. Return your response as a json object. Do not include any other text. Here is the photo: {{media url=photoDataUri}}
+  prompt: `You are an AI quiz generator.  You will generate a multiple-choice quiz based on the content of the image provided. The user will upload an image and you should respond with questions about the image. The number of questions to generate should be taken from the numQuestions field. The difficulty of the questions should be set by the difficulty field. The language of the quiz should be {{{language}}}. Return your response as a json object. Do not include any other text. Here is the photo: {{media url=photoDataUri}}
 
 Difficulty: {{{difficulty}}}
 Number of Questions: {{{numQuestions}}}
+Language: {{{language}}}
 
 Output format: JSON array of question objects with keys 'question', 'options', and 'correctAnswerIndex'. Each question must have 4 options.
 `, 
@@ -98,4 +101,3 @@ const generateQuizFromImageFlow = ai.defineFlow<
   const {output} = await generateQuizPrompt(input);
   return output!;
 });
-
