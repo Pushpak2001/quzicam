@@ -1,6 +1,6 @@
 'use client';
 
-import { useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import {
   Card,
   CardContent,
@@ -9,6 +9,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button"; // Import the Button component
 
 interface Question {
   question: string;
@@ -23,6 +24,8 @@ const QuizResultsPage = () => {
   const quiz = searchParams.get('quiz');
   const score = searchParams.get('score');
   const language = searchParams.get('language');
+
+  const router = useRouter();
 
   // Function to safely parse the quiz data
   const parseQuiz = (quizData: string | null): Question[] => {
@@ -56,7 +59,7 @@ const QuizResultsPage = () => {
               <p>
                 <strong>Your Answer:</strong>
                 <span className={cn(
-                  question.userAnswer === question.correctAnswerIndex
+                  question.isCorrect === true
                     ? "text-green-500"
                     : "text-red-500"
                 )}>
@@ -72,6 +75,7 @@ const QuizResultsPage = () => {
           </Card>
         ))}
       </div>
+            <Button onClick={() => router.push('/')}>Back to Quiz</Button>
     </div>
   );
 };
