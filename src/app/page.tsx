@@ -394,12 +394,7 @@ const App = () => {
                   </Button>
                 ))}
               </CardContent>
-              <CardFooter className="flex justify-between">
-                {activeQuestionIndex > 0 && (
-                  <Button onClick={() => setActiveQuestionIndex((i) => i - 1)}>
-                    Previous
-                  </Button>
-                )}
+              <CardFooter className="flex justify-end">
                 {isLastQuestion ? (
                   <Button onClick={handleFinishQuiz}>Finish Quiz</Button>
                 ) : (
