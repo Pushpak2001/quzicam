@@ -67,7 +67,7 @@ const QuizResultsPage = () => {
                 )}>
                   {question.userAnswer !== null && question.userAnswer !== undefined
                     ? question.options[question.userAnswer]
-                    : "Not Answered"}
+                    : (question.userAnswer === 0) ? question.options[0] : "Not Answered"}
                 </span>
               </p>
               <p className="text-green-500">
