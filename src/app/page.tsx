@@ -53,17 +53,20 @@ const App = () => {
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const [hasCameraPermission, setHasCameraPermission] = useState(false);
+  const [isCameraActive, setIsCameraActive] = useState(false);
 
   useEffect(() => {
+    let stream: MediaStream | null = null;
+
     const getCameraPermission = async () => {
       try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        stream = await navigator.mediaDevices.getUserMedia({ video: true });
         setHasCameraPermission(true);
 
         if (videoRef.current) {
           videoRef.current.srcObject = stream;
         }
-      } catch (error) {
+      } catch (error: any) {
         console.error('Error accessing camera:', error);
         setHasCameraPermission(false);
         toast({
@@ -74,8 +77,24 @@ const App = () => {
       }
     };
 
-    getCameraPermission();
-  }, []);
+    if (isCameraActive) {
+      getCameraPermission();
+    } else {
+      // If camera is not active, stop the stream
+      if (videoRef.current && videoRef.current.srcObject) {
+        stream = videoRef.current.srcObject as MediaStream;
+        stream.getTracks().forEach(track => track.stop());
+        videoRef.current.srcObject = null;
+      }
+    }
+
+    return () => {
+      // Cleanup when component unmounts or camera is deactivated
+      if (stream) {
+        stream.getTracks().forEach(track => track.stop());
+      }
+    };
+  }, [isCameraActive, toast]);
 
 
   const handleImageUpload = useCallback(
@@ -212,6 +231,11 @@ const App = () => {
 
     const imageDataURL = canvas.toDataURL('image/png');
     setImageSrc(imageDataURL);
+    setIsCameraActive(false); // Deactivate camera after capturing image
+  };
+
+  const handleActivateCamera = () => {
+    setIsCameraActive(true); // Activate camera when button is clicked
   };
 
   return (
@@ -296,14 +320,14 @@ const App = () => {
                       Upload from Device
                     </Label>
 
-                    <Button variant="outline" onClick={handleCaptureImage} disabled={!hasCameraPermission}>
+                    <Button variant="outline" onClick={handleActivateCamera}>
                       Capture Image
                     </Button>
                   </div>
 
-                  <video ref={videoRef} className="w-full aspect-video rounded-md" autoPlay muted />
+                  <video ref={videoRef} className="w-full aspect-video rounded-md" autoPlay muted style={{ display: isCameraActive ? 'block' : 'none' }}/>
 
-                  { !(hasCameraPermission) && (
+                  { !(hasCameraPermission) && isCameraActive && (
                     <Alert variant="destructive">
                               <AlertTitle>Camera Access Required</AlertTitle>
                               <AlertDescription>
@@ -319,6 +343,11 @@ const App = () => {
                       alt="Uploaded"
                       className="max-h-64 rounded-md object-contain"
                     />
+                  )}
+                  {isCameraActive && hasCameraPermission && (
+                    <Button onClick={handleCaptureImage}>
+                      Capture
+                    </Button>
                   )}
                 </CardContent>
               </Card>
