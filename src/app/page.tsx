@@ -11,7 +11,6 @@ import {
   CardContent,
   CardDescription,
   CardHeader,
-  CardFooter,
   CardTitle,
 } from "@/components/ui/card";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
@@ -171,15 +170,15 @@ const App = () => {
 
     // Automatically move to the next question after a delay
     setTimeout(() => {
-      if (activeQuestionIndex < quiz.length - 1) {
-        setActiveQuestionIndex((prevIndex) => prevIndex + 1);
-      } else {
-        // If it's the last question, finish the quiz
-        handleFinishQuiz();
-      }
       setIsSubmitting(false); // Re-enable submission after delay
     }, 1000);
   };
+
+  const moveToNextQuestion = () => {
+      if (activeQuestionIndex < quiz.length - 1) {
+        setActiveQuestionIndex((prevIndex) => prevIndex + 1);
+      }
+  }
 
   const handleFinishQuiz = () => {
     // Calculate the score
@@ -240,6 +239,9 @@ const App = () => {
         return ''; // Default style or no style
     }
   };
+
+  const showNextButton = currentQuestion?.userAnswer !== null && activeQuestionIndex < quiz.length -1;
+  const showFinishButton = currentQuestion?.userAnswer !== null && activeQuestionIndex === quiz.length - 1;
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-4">
@@ -399,13 +401,22 @@ const App = () => {
                         ? 'before:absolute before:inset-0 before:bg-green-500 before:animate-pulse before:opacity-50'
                         : ''
                     )}
-                    onClick={() => handleAnswerSelection(index)}
+                    onClick={() => {
+                        handleAnswerSelection(index);
+                        moveToNextQuestion();
+                    }}
                     disabled={currentQuestion.userAnswer !== null}
                   >
                     {option}
                   </Button>
                 ))}
               </CardContent>
+              {showNextButton && (
+                <Button onClick={moveToNextQuestion}>Next Question</Button>
+              )}
+              {showFinishButton && (
+                <Button onClick={handleFinishQuiz}>Finish Quiz</Button>
+              )}
             </Card>
           )}
         </TabsContent>
