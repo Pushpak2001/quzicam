@@ -19,6 +19,7 @@ import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useRouter } from 'next/navigation';
+import { ModeToggle } from "@/components/mode-toggle";
 
 interface Question {
   question: string;
@@ -171,7 +172,7 @@ const App = () => {
         // If it's the last question, finish the quiz
         handleFinishQuiz();
       }
-    }, 500);
+    }, 1000);
   };
 
   const handleFinishQuiz = () => {
