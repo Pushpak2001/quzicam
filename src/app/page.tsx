@@ -55,6 +55,7 @@ const App = () => {
       quiz: Question[];
       score: number;
       date: Date;
+      language: string;
     }[]
   >([]);
   const [language, setLanguage] = useState<string>("en"); // Default language
@@ -87,15 +88,10 @@ const App = () => {
     }
 
     try {
-      // Here should be implemented language detection
-      // For now I will set language to en
-      const detectedLanguage = 'en';
-
       const generatedQuiz = await generateQuizFromImage({
         photoDataUri: imageSrc,
         numQuestions: numQuestions,
         difficulty: difficulty,
-        language: detectedLanguage, // Use detected language
       });
 
       // Initialize user answers to null for each question
@@ -107,6 +103,7 @@ const App = () => {
       setQuiz(initialQuizState);
       setActiveQuestionIndex(0);
       setQuizStarted(true);
+      setLanguage(generatedQuiz.language); // Set the detected language
     } catch (error: any) {
       toast({
         title: "Failed to generate quiz. Please try again.",
@@ -165,7 +162,7 @@ const App = () => {
 
     setQuizHistory((prevHistory) => [
       ...prevHistory,
-      { quiz, score, date: new Date() },
+      { quiz, score, date: new Date(), language: language },
     ]);
     setQuizStarted(false);
   };
@@ -369,7 +366,7 @@ const App = () => {
                     <CardTitle>Quiz {index + 1}</CardTitle>
                     <CardDescription>
                       Date: {history.date.toLocaleDateString()} - Score:{" "}
-                      {history.score} / {history.quiz.length}
+                      {history.score} / {history.quiz.length} - Language: {history.language}
                     </CardDescription>
                   </CardHeader>
                   <CardContent>

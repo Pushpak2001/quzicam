@@ -27,7 +27,6 @@ const GenerateQuizFromImageInputSchema = z.object({
     .enum(['easy', 'medium', 'hard'])
     .default('medium')
     .describe('The difficulty level of the quiz.'),
-  language: z.string().default('en').describe('The language to generate the quiz in.'), // Added language field
 });
 export type GenerateQuizFromImageInput = z.infer<typeof GenerateQuizFromImageInputSchema>;
 
@@ -39,6 +38,7 @@ const GenerateQuizFromImageOutputSchema = z.object({
       correctAnswerIndex: z.number().int().describe('The index of the correct answer in the options array.'),
     })
   ).describe('The generated quiz questions.'),
+  language: z.string().describe('The language the quiz is in.'),
 });
 export type GenerateQuizFromImageOutput = z.infer<typeof GenerateQuizFromImageOutputSchema>;
 
@@ -46,8 +46,29 @@ export async function generateQuizFromImage(input: GenerateQuizFromImageInput): 
   return generateQuizFromImageFlow(input);
 }
 
+const detectLanguageTool = ai.defineTool({
+    name: 'detectLanguage',
+    description: 'Detects the language of the image content.',
+    inputSchema: z.object({
+        photoDataUri: z
+            .string()
+            .describe(
+              "A photo to detect language from, as a data URI that must include a MIME type and use Base64 encoding. Expected format: 'data:<mimetype>;base64,<encoded_data>'."
+            ),
+    }),
+    outputSchema: z.string().describe('The language code of the image content (e.g., "en" for English, "es" for Spanish).'),
+  },
+  async input => {
+    // Replace with actual language detection logic (e.g., using a library or API).
+    // This is a placeholder that always returns English for demonstration purposes.
+    // In a real implementation, you would analyze the image content to determine the language.
+    return 'en';
+  }
+);
+
 const generateQuizPrompt = ai.definePrompt({
   name: 'generateQuizPrompt',
+  tools: [detectLanguageTool],
   input: {
     schema: z.object({
       photoDataUri: z
@@ -66,7 +87,7 @@ const generateQuizPrompt = ai.definePrompt({
         .enum(['easy', 'medium', 'hard'])
         .default('medium')
         .describe('The difficulty level of the quiz.'),
-      language: z.string().default('en').describe('The language to generate the quiz in.'), // Added language
+      language: z.string().describe('The language to generate the quiz in.'),
     }),
   },
   output: {
@@ -80,14 +101,24 @@ const generateQuizPrompt = ai.definePrompt({
       ).describe('The generated quiz questions.'),
     }),
   },
-  prompt: `You are an AI quiz generator.  You will generate a multiple-choice quiz based on the content of the image provided. The user will upload an image and you should respond with questions about the image. The number of questions to generate should be taken from the numQuestions field. The difficulty of the questions should be set by the difficulty field. The language of the quiz should be {{{language}}}. Return your response as a json object. Do not include any other text. Here is the photo: {{media url=photoDataUri}}
+  prompt: `You are an AI quiz generator.  You will generate a multiple-choice quiz based on the content of the image provided. 
+  
+  First, detect the language of the image content using the detectLanguage tool.
+  Then, generate questions about the image in the detected language.
+  
+  The number of questions to generate should be taken from the numQuestions field. 
+  The difficulty of the questions should be set by the difficulty field.
+
+  Return your response as a JSON object. Do not include any other text. 
+  
+  Here is the photo: {{media url=photoDataUri}}
 
 Difficulty: {{{difficulty}}}
 Number of Questions: {{{numQuestions}}}
 Language: {{{language}}}
 
 Output format: JSON array of question objects with keys 'question', 'options', and 'correctAnswerIndex'. Each question must have 4 options.
-`, 
+`,
 });
 
 const generateQuizFromImageFlow = ai.defineFlow<
@@ -98,6 +129,7 @@ const generateQuizFromImageFlow = ai.defineFlow<
   inputSchema: GenerateQuizFromImageInputSchema,
   outputSchema: GenerateQuizFromImageOutputSchema,
 }, async input => {
-  const {output} = await generateQuizPrompt(input);
-  return output!;
+  const detectedLanguage = await detectLanguageTool({photoDataUri: input.photoDataUri});
+  const {output} = await generateQuizPrompt({...input, language: detectedLanguage});
+  return {...output!, language: detectedLanguage};
 });
