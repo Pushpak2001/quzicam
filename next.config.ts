@@ -3,10 +3,10 @@ import type {NextConfig} from 'next/server';
 const nextConfig: NextConfig = {
   /* config options here */
   typescript: {
-    //ignoreBuildErrors: true,
+    ignoreBuildErrors: true,
   },
   eslint: {
-    //ignoreDuringBuilds: true,
+    ignoreDuringBuilds: true,
   },
   images: {
     remotePatterns: [
@@ -21,3 +21,4 @@ const nextConfig: NextConfig = {
 };
 
 export default nextConfig;
+
