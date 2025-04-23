@@ -71,7 +71,7 @@ const QuizResultsPage = () => {
                 </span>
               </p>
               <p className="text-green-500">
-                <strong>Correct Answer:</strong> {question.options[question.correctAnswerIndex]}
+                <strong>Correct Answer:</strong> <span className="font-semibold">{question.options[question.correctAnswerIndex]}</span>
               </p>
             </CardContent>
           </Card>
