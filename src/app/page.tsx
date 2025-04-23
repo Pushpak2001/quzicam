@@ -51,10 +51,7 @@ const App = () => {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-
   useEffect(() => {
-    let stream: MediaStream | null = null;
-
     const getCameraPermission = async () => {
       try {
         const stream = await navigator.mediaDevices.getUserMedia({ video: true });
@@ -73,25 +70,7 @@ const App = () => {
         });
       }
     };
-
-    if (isCameraActive) {
-      getCameraPermission();
-    } else {
-      // If camera is not active, stop the stream
-      if (videoRef.current && videoRef.current.srcObject) {
-        stream = videoRef.current.srcObject as MediaStream;
-        stream.getTracks().forEach(track => track.stop());
-        videoRef.current.srcObject = null;
-      }
-    }
-
-    return () => {
-      // Cleanup when component unmounts or camera is deactivated
-      if (stream) {
-        stream.getTracks().forEach(track => track.stop());
-      }
-    };
-  }, [isCameraActive, toast]);
+  }, [toast]);
 
 
   const handleImageUpload = useCallback(
@@ -212,7 +191,7 @@ const App = () => {
   const isCorrect =
     currentQuestion?.userAnswer === currentQuestion?.correctAnswerIndex;
 
-  const handleCaptureImage = () => {
+  const handleCaptureImage = async () => {
     if (!videoRef.current) {
       toast({
         title: "Camera not initialized.",
@@ -222,38 +201,53 @@ const App = () => {
       return;
     }
 
-    const video = videoRef.current;
-    const canvas = document.createElement('canvas');
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
-    canvas.getContext('2d')?.drawImage(video, 0, 0, video.videoWidth, video.videoHeight);
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      videoRef.current.srcObject = stream;
+      const video = videoRef.current;
+      const canvas = document.createElement('canvas');
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      canvas.getContext('2d')?.drawImage(video, 0, 0, video.videoWidth, video.videoHeight);
 
-    const imageDataURL = canvas.toDataURL('image/png');
-    setImageSrc(imageDataURL);
-    setIsCameraActive(false); // Deactivate camera after capturing image
+      const imageDataURL = canvas.toDataURL('image/png');
+      setImageSrc(imageDataURL);
+      setIsCameraActive(false); // Deactivate camera after capturing image
+      stream.getTracks().forEach(track => track.stop());
+      videoRef.current.srcObject = null;
+
+
+    } catch (error: any) {
+      console.error('Error accessing camera:', error);
+      setHasCameraPermission(false);
+      toast({
+        variant: 'destructive',
+        title: 'Camera Access Denied',
+        description: 'Please enable camera permissions in your browser settings to use this app.',
+      });
+      setIsCameraActive(false);
+    }
+
   };
 
-  const handleActivateCamera = () => {
-      const getCameraPermission = async () => {
-          try {
-              const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-              setHasCameraPermission(true);
-
-              if (videoRef.current) {
-                  videoRef.current.srcObject = stream;
-              }
-              setIsCameraActive(true);
-          } catch (error: any) {
-              console.error('Error accessing camera:', error);
-              setHasCameraPermission(false);
-              toast({
-                  variant: 'destructive',
-                  title: 'Camera Access Denied',
-                  description: 'Please enable camera permissions in your browser settings to use this app.',
-              });
-          }
-      };
-      getCameraPermission();
+  const handleActivateCamera = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      setHasCameraPermission(true);
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+      }
+      setIsCameraActive(true);
+    } catch (error: any) {
+      console.error('Error accessing camera:', error);
+      setHasCameraPermission(false);
+      toast({
+        variant: 'destructive',
+        title: 'Camera Access Denied',
+        description: 'Please enable camera permissions in your browser settings to use this app.',
+      });
+      setIsCameraActive(false);
+    }
   };
 
 
@@ -355,7 +349,7 @@ const App = () => {
                       Upload from Device
                     </Label>
 
-                    <Button variant="outline" onClick={handleActivateCamera}>
+                    <Button variant="outline" onClick={handleActivateCamera} disabled={isCameraActive}>
                       Capture Image
                     </Button>
                   </div>
@@ -380,7 +374,7 @@ const App = () => {
                     />
                   )}
                   {isCameraActive && hasCameraPermission && (
-                    <Button onClick={handleCaptureImage}>
+                    <Button onClick={handleCaptureImage} disabled={isSubmitting}>
                       Capture
                     </Button>
                   )}
@@ -443,6 +437,9 @@ const App = () => {
                   </Button>
                 ))}
               </CardContent>
+                <Button onClick={handleFinishQuiz}>
+                    Finish Quiz
+                </Button>
             </Card>
           )}
         </TabsContent>
