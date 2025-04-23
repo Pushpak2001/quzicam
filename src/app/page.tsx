@@ -24,6 +24,7 @@ interface Question {
   options: string[];
   correctAnswerIndex: number;
   userAnswer?: number | null;
+  isCorrect?: boolean | null;
 }
 
 const difficultyLevels = [
@@ -136,6 +137,7 @@ const App = () => {
       const initialQuizState = generatedQuiz.questions.map((question) => ({
         ...question,
         userAnswer: null,
+        isCorrect: null,
       }));
 
       setQuiz(initialQuizState);
@@ -156,20 +158,24 @@ const App = () => {
   const handleAnswerSelection = (optionIndex: number) => {
     setQuiz((prevQuiz) => {
       const updatedQuiz = [...prevQuiz];
+      const isCorrect = optionIndex === prevQuiz[activeQuestionIndex].correctAnswerIndex;
       updatedQuiz[activeQuestionIndex] = {
         ...prevQuiz[activeQuestionIndex],
         userAnswer: optionIndex,
+        isCorrect: isCorrect,
       };
       return updatedQuiz;
     });
 
     // Automatically move to the next question
-    if (activeQuestionIndex < quiz.length - 1) {
-      setActiveQuestionIndex((prevIndex) => prevIndex + 1);
-    } else {
-      // If it's the last question, finish the quiz
-      handleFinishQuiz();
-    }
+    setTimeout(() => {
+      if (activeQuestionIndex < quiz.length - 1) {
+        setActiveQuestionIndex((prevIndex) => prevIndex + 1);
+      } else {
+        // If it's the last question, finish the quiz
+        handleFinishQuiz();
+      }
+    }, 500);
   };
 
   const handleNextQuestion = () => {
@@ -384,18 +390,26 @@ const App = () => {
                   <Button
                     key={index}
                     variant="outline"
-                    className={`w-full justify-start ${
+                    className={cn(
+                      "w-full justify-start relative",
                       currentQuestion.userAnswer === index
-                        ? isCorrect
-                          ? "bg-green-500 text-green-50"
-                          : "bg-red-500 text-red-50"
-                        : ""
-                    } ${
+                        ? currentQuestion.isCorrect
+                          ? "text-green-50"
+                          : "text-red-50"
+                        : "",
                       currentQuestion.userAnswer !== null &&
-                      index === currentQuestion.correctAnswerIndex
-                        ? "bg-green-500 text-green-50"
-                        : ""
-                    }`}
+                        index === currentQuestion.correctAnswerIndex
+                        ? "text-green-50"
+                        : "",
+                      currentQuestion.userAnswer === index && currentQuestion.isCorrect === true
+                      ? 'bg-green-500'
+                      : currentQuestion.userAnswer === index && currentQuestion.isCorrect === false
+                        ? 'bg-red-500'
+                        : '',
+                      (currentQuestion.userAnswer !== null && !currentQuestion.isCorrect && index === currentQuestion.correctAnswerIndex)
+                        ? 'before:absolute before:inset-0 before:bg-green-500 before:animate-pulse before:opacity-50'
+                        : ''
+                    )}
                     onClick={() => handleAnswerSelection(index)}
                     disabled={currentQuestion.userAnswer !== null}
                   >
