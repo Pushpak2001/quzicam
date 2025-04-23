@@ -31,7 +31,7 @@ export default function RootLayout({
         <div className="fixed top-4 right-4 z-50">
           <ModeToggle />
         </div>
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
           {children}
         </ThemeProvider>
         <Toaster/>
@@ -39,3 +39,4 @@ export default function RootLayout({
     </html>
   );
 }
+
