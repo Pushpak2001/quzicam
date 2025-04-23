@@ -53,7 +53,9 @@ const QuizResultsPage = () => {
           <Card key={index}>
             <CardHeader>
               <CardTitle>Question {index + 1}</CardTitle>
-              <CardDescription>{question.question}</CardDescription>
+              <CardDescription>
+                <strong className="font-bold">{question.question}</strong>
+              </CardDescription>
             </CardHeader>
             <CardContent className="grid gap-4">
               <p>
