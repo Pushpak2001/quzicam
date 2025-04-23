@@ -234,8 +234,28 @@ const App = () => {
   };
 
   const handleActivateCamera = () => {
-    setIsCameraActive(true); // Activate camera when button is clicked
+      const getCameraPermission = async () => {
+          try {
+              const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+              setHasCameraPermission(true);
+
+              if (videoRef.current) {
+                  videoRef.current.srcObject = stream;
+              }
+              setIsCameraActive(true);
+          } catch (error: any) {
+              console.error('Error accessing camera:', error);
+              setHasCameraPermission(false);
+              toast({
+                  variant: 'destructive',
+                  title: 'Camera Access Denied',
+                  description: 'Please enable camera permissions in your browser settings to use this app.',
+              });
+          }
+      };
+      getCameraPermission();
   };
+
 
     const getLanguageSpecificClassName = (baseClassName: string = "") => {
         let languageClassName = "";
