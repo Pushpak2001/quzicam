@@ -51,6 +51,7 @@ const App = () => {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+
   useEffect(() => {
     let stream: MediaStream | null = null;
 
@@ -236,14 +237,21 @@ const App = () => {
     setIsCameraActive(true); // Activate camera when button is clicked
   };
 
-  const getLanguageSpecificClassName = () => {
-    switch (quizLanguage) {
-      case 'mr':
-        return 'marathi-font';
-      default:
-        return ''; // Default style or no style
-    }
-  };
+    const getLanguageSpecificClassName = (baseClassName: string = "") => {
+        let languageClassName = "";
+
+        switch (quizLanguage) {
+            case 'mr':
+                languageClassName = 'marathi-font';
+                break;
+            default:
+                languageClassName = '';
+                break;
+        }
+
+        return cn(baseClassName, languageClassName);
+    };
+
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-4">
@@ -376,9 +384,9 @@ const App = () => {
                 <CardTitle>
                   Question {activeQuestionIndex + 1} of {quiz.length}
                 </CardTitle>
-                <CardDescription className={cn(
-                  getLanguageSpecificClassName(),
-                )}>{currentQuestion?.question}</CardDescription>
+                <CardDescription className={getLanguageSpecificClassName()}>
+                  {currentQuestion?.question}
+                </CardDescription>
               </CardHeader>
               <CardContent className="grid gap-4">
                 {currentQuestion?.options.map((option, index) => (
@@ -403,7 +411,8 @@ const App = () => {
                         : '',
                       (currentQuestion.userAnswer !== null && !currentQuestion.isCorrect && index === currentQuestion.correctAnswerIndex)
                         ? 'before:absolute before:inset-0 before:bg-green-500 before:animate-pulse before:opacity-50'
-                        : ''
+                        : '',
+                       getLanguageSpecificClassName()
                     )}
                     onClick={() => {
                         handleAnswerSelection(index);
