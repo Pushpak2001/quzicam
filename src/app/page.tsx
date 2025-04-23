@@ -19,7 +19,6 @@ import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useRouter } from 'next/navigation';
-import { ModeToggle } from "@/components/mode-toggle";
 
 interface Question {
   question: string;
@@ -43,7 +42,6 @@ const App = () => {
   const [imageSrc, setImageSrc] = useState<string | null>(null);
   const [quizStarted, setQuizStarted] = useState<boolean>(false);
   const [quizLanguage, setQuizLanguage] = useState<string>("");
-  const [language, setLanguage] = useState<string>("en"); // Default language
   const { toast } = useToast();
   const [isGenerating, setIsGenerating] = useState(false);
 
@@ -58,7 +56,7 @@ const App = () => {
 
     const getCameraPermission = async () => {
       try {
-        stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
         setHasCameraPermission(true);
 
         if (videoRef.current) {
@@ -201,7 +199,6 @@ const App = () => {
   };
 
   const currentQuestion = quiz[activeQuestionIndex];
-  const isLastQuestion = activeQuestionIndex === quiz.length - 1;
   const isCorrect =
     currentQuestion?.userAnswer === currentQuestion?.correctAnswerIndex;
 
@@ -395,13 +392,6 @@ const App = () => {
                   </Button>
                 ))}
               </CardContent>
-              <CardFooter className="flex justify-end">
-                {/* {isLastQuestion ? (
-                  <Button onClick={handleFinishQuiz}>Finish Quiz</Button>
-                ) : (
-                 null
-                )} */}
-              </CardFooter>
             </Card>
           )}
         </TabsContent>
