@@ -162,6 +162,14 @@ const App = () => {
       };
       return updatedQuiz;
     });
+
+    // Automatically move to the next question
+    if (activeQuestionIndex < quiz.length - 1) {
+      setActiveQuestionIndex((prevIndex) => prevIndex + 1);
+    } else {
+      // If it's the last question, finish the quiz
+      handleFinishQuiz();
+    }
   };
 
   const handleNextQuestion = () => {
@@ -404,12 +412,7 @@ const App = () => {
                 {isLastQuestion ? (
                   <Button onClick={handleFinishQuiz}>Finish Quiz</Button>
                 ) : (
-                  <Button
-                    onClick={handleNextQuestion}
-                    disabled={currentQuestion?.userAnswer === null}
-                  >
-                    Next
-                  </Button>
+                 null
                 )}
               </CardFooter>
             </Card>
