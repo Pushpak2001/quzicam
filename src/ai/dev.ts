@@ -1,1 +1,2 @@
-// Flows will be imported for their side effects in this file.
+import '@/ai/flows/analyze-quiz-performance.ts';
+import '@/ai/flows/generate-quiz-from-image.ts';
