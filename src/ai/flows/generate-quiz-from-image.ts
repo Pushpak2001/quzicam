@@ -66,9 +66,27 @@ const detectLanguageTool = ai.defineTool({
   }
 );
 
+const translateTextTool = ai.defineTool({
+    name: 'translateText',
+    description: 'Translates the given text to the specified language.',
+    inputSchema: z.object({
+        text: z.string().describe('The text to translate.'),
+        targetLanguage: z.string().describe('The language code to translate the text to (e.g., "en" for English, "es" for Spanish).'),
+    }),
+    outputSchema: z.string().describe('The translated text.'),
+  },
+  async input => {
+    // Replace with actual translation logic (e.g., using a library or API).
+    // This is a placeholder that always returns the same text for demonstration purposes.
+    // In a real implementation, you would use a translation API to translate the text.
+    return input.text;
+  }
+);
+
+
 const generateQuizPrompt = ai.definePrompt({
   name: 'generateQuizPrompt',
-  tools: [detectLanguageTool],
+  tools: [detectLanguageTool, translateTextTool],
   input: {
     schema: z.object({
       photoDataUri: z
@@ -105,6 +123,7 @@ const generateQuizPrompt = ai.definePrompt({
   
   First, detect the language of the image content using the detectLanguage tool.
   Then, generate questions about the image in the detected language.
+  If the detected language is not English, translate the question and answer options to the detected language using the translateText tool.
   
   The number of questions to generate should be taken from the numQuestions field. 
   The difficulty of the questions should be set by the difficulty field.
@@ -131,5 +150,29 @@ const generateQuizFromImageFlow = ai.defineFlow<
 }, async input => {
   const detectedLanguage = await detectLanguageTool({photoDataUri: input.photoDataUri});
   const {output} = await generateQuizPrompt({...input, language: detectedLanguage});
+
+   // Translate questions and options if the detected language is not English
+   if (detectedLanguage !== 'en') {
+    output!.questions = await Promise.all(
+      output!.questions.map(async question => {
+        const translatedQuestion = await translateTextTool({
+          text: question.question,
+          targetLanguage: detectedLanguage,
+        });
+        const translatedOptions = await Promise.all(
+          question.options.map(async option =>
+            translateTextTool({text: option, targetLanguage: detectedLanguage})
+          )
+        );
+
+        return {
+          ...question,
+          question: translatedQuestion,
+          options: translatedOptions,
+        };
+      })
+    );
+  }
+
   return {...output!, language: detectedLanguage};
 });
