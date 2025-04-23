@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -28,6 +28,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { CardFooter } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
 
 interface Question {
   question: string;
@@ -60,6 +61,7 @@ const App = () => {
   >([]);
   const [language, setLanguage] = useState<string>("en"); // Default language
   const { toast } = useToast();
+  const [isGenerating, setIsGenerating] = useState(false);
 
   const handleImageUpload = useCallback(
     async (file: File | null) => {
@@ -87,6 +89,8 @@ const App = () => {
       return;
     }
 
+    setIsGenerating(true);
+
     try {
       const generatedQuiz = await generateQuizFromImage({
         photoDataUri: imageSrc,
@@ -110,6 +114,8 @@ const App = () => {
         description: error.message,
         variant: "destructive",
       });
+    } finally {
+      setIsGenerating(false);
     }
   }, [imageSrc, numQuestions, difficulty, toast]);
 
@@ -298,7 +304,14 @@ const App = () => {
                 </CardContent>
               </Card>
 
-              <Button onClick={generateQuiz} disabled={!imageSrc}>
+              <Button
+                onClick={generateQuiz}
+                disabled={!imageSrc || isGenerating}
+                className={cn(
+                  "relative",
+                  isGenerating && "animate-pulse cursor-not-allowed"
+                )}
+              >
                 Generate Quiz
               </Button>
             </div>
