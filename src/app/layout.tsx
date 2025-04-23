@@ -2,6 +2,7 @@ import type {Metadata} from 'next/server';
 import {Geist, Geist_Mono} from 'next/font/google';
 import './globals.css';
 import {Toaster} from "@/components/ui/toaster";
+import {ModeToggle} from "@/components/mode-toggle";
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -24,8 +25,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark">
+    <html lang="en" suppressHydrationWarning>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+        <div className="fixed top-4 right-4 z-50">
+          <ModeToggle />
+        </div>
         {children}
         <Toaster/>
       </body>

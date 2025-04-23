@@ -44,6 +44,44 @@ body {
     --success: 142 76% 36%;
     --error: 0 84% 60%;
   }
+
+  .light {
+    --background: 255, 255, 255;
+    --foreground: 12, 12, 12;
+    --card: 255, 255, 255;
+    --card-foreground: 12, 12, 12;
+    --popover: 255, 255, 255;
+    --popover-foreground: 12, 12, 12;
+    --primary: 41, 171, 226;
+    --primary-foreground: 255, 255, 255;
+    --secondary: 243, 243, 243;
+    --secondary-foreground: 12, 12, 12;
+    --muted: 243, 243, 243;
+    --muted-foreground: 119, 119, 119;
+    --accent: 41, 171, 226;
+    --accent-foreground: 255, 255, 255;
+    --destructive: 158, 34, 34;
+    --destructive-foreground: 255, 255, 255;
+    --border: 204, 204, 204;
+    --input: 204, 204, 204;
+    --ring: 41, 171, 226;
+    --chart-1: 220 70% 50%;
+    --chart-2: 160 60% 45%;
+    --chart-3: 30 80% 55%;
+    --chart-4: 280 65% 60%;
+    --chart-5: 340 75% 55%;
+    --sidebar-background: 243, 243, 243;
+    --sidebar-foreground: 12, 12, 12;
+    --sidebar-primary: 41, 171, 226;
+    --sidebar-primary-foreground: 255, 255, 255;
+    --sidebar-accent: 243, 243, 243;
+    --sidebar-accent-foreground: 12, 12, 12;
+    --sidebar-border: 243, 243, 243;
+    --sidebar-ring: 41, 171, 226;
+    --success: 142 76% 36%;
+    --error: 0 84% 60%;
+  }
+
   .dark {
     --background: 12, 12, 12;
     --foreground: 255, 255, 255;
@@ -90,3 +128,4 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
