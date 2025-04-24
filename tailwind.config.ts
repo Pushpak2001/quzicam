@@ -59,7 +59,13 @@ export default {
   				'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
   				border: 'hsl(var(--sidebar-border))',
   				ring: 'hsl(var(--sidebar-ring))'
-  			}
+  			},
+        /* COLOR PALETTE */
+        'vivid-purple': 'hsl(var(--vivid-purple))',
+        'vivid-green': 'hsl(var(--vivid-green))',
+        'vivid-blue': 'hsl(var(--vivid-blue))',
+        'vivid-yellow': 'hsl(var(--vivid-yellow))',
+        'vivid-orange': 'hsl(var(--vivid-orange))',
   		},
   		borderRadius: {
   			lg: 'var(--radius)',

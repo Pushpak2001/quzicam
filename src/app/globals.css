@@ -43,6 +43,14 @@ body {
     --sidebar-ring: 180, 150, 230; /* Muted purple ring */
     --success: 142 76% 36%;
     --error: 0 84% 60%;
+
+    /* NEW COLOR PALETTE */
+    --vivid-purple: 155, 48, 255;
+    --vivid-green: 0, 255, 127;
+    --vivid-blue: 0, 191, 255;
+    --vivid-yellow: 255, 255, 0;
+    --vivid-orange: 255, 165, 0;
+
   }
 }
 
@@ -54,3 +62,4 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
