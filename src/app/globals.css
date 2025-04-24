@@ -8,39 +8,39 @@ body {
 
 @layer base {
   :root {
-    --background: 255, 255, 255;
-    --foreground: 12, 12, 12;
-    --card: 255, 255, 255;
-    --card-foreground: 12, 12, 12;
-    --popover: 255, 255, 255;
-    --popover-foreground: 12, 12, 12;
-    --primary: 41, 171, 226;
+    --background: 245, 240, 255; /* Light lavender */
+    --foreground: 30, 0, 80; /* Dark purple */
+    --card: 255, 255, 240; /* Light yellow */
+    --card-foreground: 30, 0, 80; /* Dark purple */
+    --popover: 255, 240, 245; /* Light pink */
+    --popover-foreground: 30, 0, 80; /* Dark purple */
+    --primary: 99, 102, 241; /* Medium indigo */
     --primary-foreground: 255, 255, 255;
-    --secondary: 243, 243, 243;
-    --secondary-foreground: 12, 12, 12;
-    --muted: 243, 243, 243;
-    --muted-foreground: 119, 119, 119;
-    --accent: 41, 171, 226;
-    --accent-foreground: 255, 255, 255;
-    --destructive: 158, 34, 34;
+    --secondary: 224, 231, 255; /* Light blue */
+    --secondary-foreground: 30, 0, 80; /* Dark purple */
+    --muted: 230, 224, 235; /* Light muted purple */
+    --muted-foreground: 90, 80, 100; /* Medium muted purple */
+    --accent: 255, 190, 11; /* Vivid orange */
+    --accent-foreground: 30, 0, 80; /* Dark purple */
+    --destructive: 220, 53, 69; /* Vivid red */
     --destructive-foreground: 255, 255, 255;
-    --border: 204, 204, 204;
-    --input: 204, 204, 204;
-    --ring: 41, 171, 226;
+    --border: 214, 204, 224; /* Light muted purple border */
+    --input: 224, 231, 255; /* Light blue input */
+    --ring: 150, 120, 200; /* Muted purple ring */
     --chart-1: 220 70% 50%;
     --chart-2: 160 60% 45%;
     --chart-3: 30 80% 55%;
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
     --radius: 0.5rem;
-    --sidebar-background: 243, 243, 243;
-    --sidebar-foreground: 12, 12, 12;
-    --sidebar-primary: 41, 171, 226;
+    --sidebar-background: 255, 240, 245; /* Light pink */
+    --sidebar-foreground: 30, 0, 80; /* Dark purple */
+    --sidebar-primary: 255, 100, 150; /* Bright pink */
     --sidebar-primary-foreground: 255, 255, 255;
-    --sidebar-accent: 243, 243, 243;
-    --sidebar-accent-foreground: 12, 12, 12;
-    --sidebar-border: 243, 243, 243;
-    --sidebar-ring: 41, 171, 226;
+    --sidebar-accent: 245, 230, 255; /* Lighter purple */
+    --sidebar-accent-foreground: 30, 0, 80; /* Dark purple */
+    --sidebar-border: 234, 224, 244; /* Lighter muted purple */
+    --sidebar-ring: 180, 150, 230; /* Muted purple ring */
     --success: 142 76% 36%;
     --error: 0 84% 60%;
   }
@@ -54,5 +54,3 @@ body {
     @apply bg-background text-foreground;
   }
 }
-
-
