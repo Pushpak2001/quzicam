@@ -16,7 +16,6 @@ import {
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useRouter } from 'next/navigation';
 import { useSearchParams } from 'next/navigation';
 
@@ -44,34 +43,8 @@ const App = () => {
   const [quizLanguage, setQuizLanguage] = useState<string>("");
   const { toast } = useToast();
   const [isGenerating, setIsGenerating] = useState(false);
-
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const [hasCameraPermission, setHasCameraPermission] = useState(false);
-  const [isCameraActive, setIsCameraActive] = useState(false);
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  useEffect(() => {
-    const getCameraPermission = async () => {
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-        setHasCameraPermission(true);
-
-        if (videoRef.current) {
-          videoRef.current.srcObject = stream;
-        }
-      } catch (error: any) {
-        console.error('Error accessing camera:', error);
-        setHasCameraPermission(false);
-        toast({
-          variant: 'destructive',
-          title: 'Camera Access Denied',
-          description: 'Please enable camera permissions in your browser settings to use this app.',
-        });
-      }
-    };
-  }, [toast]);
-
 
   const handleImageUpload = useCallback(
     async (file: File | null) => {
@@ -191,65 +164,6 @@ const App = () => {
   const isCorrect =
     currentQuestion?.userAnswer === currentQuestion?.correctAnswerIndex;
 
-  const handleCaptureImage = async () => {
-    if (!videoRef.current) {
-      toast({
-        title: "Camera not initialized.",
-        description: "Please wait for the camera to initialize and grant permissions.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-      videoRef.current.srcObject = stream;
-      const video = videoRef.current;
-      const canvas = document.createElement('canvas');
-      canvas.width = video.videoWidth;
-      canvas.height = video.videoHeight;
-      canvas.getContext('2d')?.drawImage(video, 0, 0, video.videoWidth, video.videoHeight);
-
-      const imageDataURL = canvas.toDataURL('image/png');
-      setImageSrc(imageDataURL);
-      setIsCameraActive(false); // Deactivate camera after capturing image
-      stream.getTracks().forEach(track => track.stop());
-      videoRef.current.srcObject = null;
-
-
-    } catch (error: any) {
-      console.error('Error accessing camera:', error);
-      setHasCameraPermission(false);
-      toast({
-        variant: 'destructive',
-        title: 'Camera Access Denied',
-        description: 'Please enable camera permissions in your browser settings to use this app.',
-      });
-      setIsCameraActive(false);
-    }
-
-  };
-
-  const handleActivateCamera = async () => {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-      setHasCameraPermission(true);
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-      }
-      setIsCameraActive(true);
-    } catch (error: any) {
-      console.error('Error accessing camera:', error);
-      setHasCameraPermission(false);
-      toast({
-        variant: 'destructive',
-        title: 'Camera Access Denied',
-        description: 'Please enable camera permissions in your browser settings to use this app.',
-      });
-      setIsCameraActive(false);
-    }
-  };
-
 
     const getLanguageSpecificClassName = (baseClassName: string = "") => {
         let languageClassName = "";
@@ -348,23 +262,7 @@ const App = () => {
                     >
                       Upload from Device
                     </Label>
-
-                    <Button variant="outline" onClick={handleActivateCamera} disabled={isCameraActive}>
-                      Capture Image
-                    </Button>
                   </div>
-
-                  <video ref={videoRef} className="w-full aspect-video rounded-md" autoPlay muted style={{ display: isCameraActive ? 'block' : 'none' }}/>
-
-                  { !(hasCameraPermission) && isCameraActive && (
-                    <Alert variant="destructive">
-                              <AlertTitle>Camera Access Required</AlertTitle>
-                              <AlertDescription>
-                                Please allow camera access to use this feature.
-                              </AlertDescription>
-                      </Alert>
-                  )
-                  }
 
                   {imageSrc && (
                     <img
@@ -372,11 +270,6 @@ const App = () => {
                       alt="Uploaded"
                       className="max-h-64 rounded-md object-contain"
                     />
-                  )}
-                  {isCameraActive && hasCameraPermission && (
-                    <Button onClick={handleCaptureImage} disabled={isSubmitting}>
-                      Capture
-                    </Button>
                   )}
                 </CardContent>
               </Card>
